@@ -5,9 +5,7 @@ Created on Thu Oct 18 12:51:24 2018
 @author: bruno
 """
 
-"""
-In this file we will put our implementations of ML methods
-"""
+import numpy as np
 
 import numpy as np
 
@@ -83,8 +81,6 @@ def ridge_regression(y,tx,lambda_):
     return w, loss
 
 
-
-
 def sigmoid(activation):
     """
     takes activation(should look like tw.dot(x))
@@ -115,12 +111,14 @@ def logistic_regression(y,tx,initial_w,max_iter,gamma):
     """
     activations=tx.dot(initial_w)
     w=initial_w
+
+    loss = 10000
     for i in range(max_iter):
         delta=tx.T.dot(derivative_of_cross_entropy_error(y,activations))/len(y)
-        loss = compute_loss(y,tx,w)
         w=w-gamma*delta
         activations=tx.dot(w)
-    return w , loss 
+        loss = compute_loss(y, tx, w)
+    return w, loss
 
 def reg_logistic_regression(y,tx,lambda_,initial_w,max_iter,gamma):
     """
@@ -131,7 +129,8 @@ def reg_logistic_regression(y,tx,lambda_,initial_w,max_iter,gamma):
     loss = 10000
     for i in range(max_iter):
         delta=tx.T.dot(derivative_of_cross_entropy_error(y,activations))/len(y)+2*lambda_*w
-        loss = compute_loss(y,tx,w)
+
         w=w-gamma*delta
         activations=tx.dot(w)
-    return w,loss
+        loss = compute_loss(y,tx,w)
+    return w, loss
