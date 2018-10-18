@@ -6,7 +6,7 @@ Created on Thu Oct 18 12:17:24 2018
 """
 
 import numpy as np
-from proj1_helpers import load_csv_data
+from utils.proj1_helpers import load_csv_data
 
 def column_replace_invalid_by_mean(col):
     mean = np.mean(col[col != -999])
