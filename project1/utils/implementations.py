@@ -134,3 +134,24 @@ def reg_logistic_regression(y,tx,lambda_,initial_w,max_iter,gamma):
         activations=tx.dot(w)
         loss = compute_loss(y,tx,w)
     return w, loss
+
+
+def cross_validation(model,data_y,data_x,lambda_,initial_w,max_iter,gamma,proportion):
+    nb_bins=int(1./proportion)
+    size=len(data_y)
+    train_loss=np.zeros(size)
+    test_loss=np.zeros(size)
+    per_bins=int(np.ceil((nb_bins*proportion)))
+    for i in range(nb_bins-1):
+
+        test_mask=np.array([False]*size)
+        test_mask[i*per_bins:(i+1)*per_bins]=True
+        
+        train_mask=np.logical_not(np.zeros(size),test_mask)
+        train_x=data_x[train_mask,:]
+        train_y=data_y[train_mask]
+        test_x=data_x[test_mask,:]
+        test_y=data_y[test_mask]
+        w,train_loss[i]=model(train_y,train_x,lambda_,initial_w, max_iter,gamma)
+        test_loss[i]=compute_loss(test_y,test_x,w)
+    return np.mean(train_loss), np.mean(test_loss),np.std(train_loss),np.std(test_loss)
