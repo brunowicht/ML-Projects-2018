@@ -66,7 +66,7 @@ def least_squares_SGD(y,tx,initial_w,max_iters,gamma):
         
 def least_squares(y,tx):
     
-    w = np.linalg.lstsq(tx,y,rcond=None)[0]
+    w = np.linalg.lstsq(tx,y)[0]
     loss = compute_loss(y,tx,w)
     return w , loss
     
