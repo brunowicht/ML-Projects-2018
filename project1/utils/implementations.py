@@ -9,6 +9,8 @@ Created on Thu Oct 18 12:51:24 2018
 In this file we will put our implementations of ML methods
 """
 
+import numpy as np
+
 def calculate_mse(e):
     """Calculate the mse for vector e."""
     return 1/2*np.mean(e**2)
@@ -79,3 +81,57 @@ def ridge_regression(y,tx,lambda_):
     w = np.linalg.inv(xtx + lambdaI).dot(xty)
     loss = compute_loss(y,tx,w)
     return w, loss
+
+
+
+
+def sigmoid(activation):
+    """
+    takes activation(should look like tw.dot(x))
+    returns the sigmoid of the activation
+    
+    used for logisitic regression
+    """
+    return 1./(1+np.exp(-activation))
+
+
+def derivative_of_cross_entropy_error(y,activation):
+    """
+    takes observed y, and activation (which is tx dot weights)
+    returns the derivative of categorical cross entropy cross entropy
+    NOTE: the categorical cross entropy has a theoretical basis
+          for logistic regression (least squares has none for this regression)
+          more on that on https://en.wikipedia.org/wiki/Cross_entropy#Cross-entropy_error_function_and_logistic_regression
+    """
+    sigma=sigmoid(activation)
+    return(-y*(1-sigma)+(1-y)*sigma)
+
+def logistic_regression(y,tx,initial_w,max_iter,gamma):
+    """
+    takes observed y, regressors tx, initialized parameters initial_w,
+          max number of iterations max_iter and gamma
+          for gradient descent
+    returns w, the optimal parameters for logistic regression, approximated by gradient descent
+    """
+    activations=tx.dot(initial_w)
+    w=initial_w
+    for i in range(max_iter):
+        delta=tx.T.dot(derivative_of_cross_entropy_error(y,activations))/len(y)
+        loss = compute_loss(y,tx,w)
+        w=w-gamma*delta
+        activations=tx.dot(w)
+    return w , loss 
+
+def reg_logistic_regression(y,tx,lambda_,initial_w,max_iter,gamma):
+    """
+    Performs logistic regression like logistic_regression, but with a ridge regression factor
+    """
+    activations=tx.dot(initial_w)
+    w=initial_w
+    loss = 10000
+    for i in range(max_iter):
+        delta=tx.T.dot(derivative_of_cross_entropy_error(y,activations))/len(y)+2*lambda_*w
+        loss = compute_loss(y,tx,w)
+        w=w-gamma*delta
+        activations=tx.dot(w)
+    return w,loss
