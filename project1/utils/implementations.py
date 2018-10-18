@@ -9,6 +9,27 @@ Created on Thu Oct 18 12:51:24 2018
 In this file we will put our implementations of ML methods
 """
 
+def calculate_mse(e):
+    """Calculate the mse for vector e."""
+    return 1/2*np.mean(e**2)
+
+
+def calculate_mae(e):
+    """Calculate the mae for vector e."""
+    return np.mean(np.abs(e))
+
+
+def compute_loss(y, tx, w):
+    """Calculate the loss.
+
+    You can calculate the loss using mse or mae.
+    """
+    e = y - tx.dot(w)
+    return calculate_mse(e)
+
+def compute_gradient(y,tx,w):
+    e = y - tx.dot(w)
+    return -tx.T.dot(e)/len(tx)
 
 
 def least_squares_GD(y,tx,initial_w,max_iters,gamma):
