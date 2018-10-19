@@ -137,6 +137,10 @@ def reg_logistic_regression(y,tx,lambda_,initial_w,max_iter,gamma):
 
 
 def equipartition(data_y,proportion,fold_idx):
+    """
+    given the data_y, the proportion of data split and the  episode
+    returns bool mask for the split 
+    """
     #fold_idx starts at one
     nb_bins=int(1./proportion)
 
@@ -190,7 +194,6 @@ def cross_validation(model,data_y,data_x,lambda_,initial_w,max_iter,gamma,propor
     size=len(data_y)
     train_loss=np.zeros(nb_bins)
     test_loss=np.zeros(nb_bins)
-    per_bins=int(np.ceil((size*proportion)))
     for i in range(nb_bins):
 
         train_mask,test_mask=equipartition(data_y,proportion,i)
@@ -207,3 +210,18 @@ def normal_train(x):
     return (x-mu)/(std+1e-17),mu,std
 def  normal_test(x,mu,std):
     return (x-mu)/(std+1e-17)
+
+def next_feature(model,data_y,data_x,lambda_,initial_w,max_iter,gamma,proportion,fixed_features):
+    nb_features=data_x.shape[1]
+    test_error=[1000]*nb_features
+    for i in range(nb_features):
+        if i not in fixed_features:
+            features=fixed_features+[i]
+            regressor=np.ones((len(data_y),len(fixed_features)+1))
+            regressor[:,1:]=data_x[:,np.array(features)]
+            a_,b_,test_error[i]=cross_validation(model,data_y,regressor,lambda_,initial_w,max_iter,gamma,proportion)
+    
+            
+
+
+
