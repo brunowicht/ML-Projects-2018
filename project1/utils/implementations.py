@@ -136,22 +136,74 @@ def reg_logistic_regression(y,tx,lambda_,initial_w,max_iter,gamma):
     return w, loss
 
 
+def equipartition(data_y,proportion,fold_idx):
+    #fold_idx starts at one
+    nb_bins=int(1./proportion)
+
+    #find the position where the label 1 stands
+    pos_1= np.where(data_y==1)[0]
+    size_1=np.sum(data_y==1)
+    #find the position  where the label 0 / -1 stands
+    pos_0=np.where(data_y !=1)[0]
+    size_0=np.sum(data_y !=1)
+    
+    size=len(data_y)
+    per_bins_1=int(np.ceil(size_1*proportion))
+    per_bins_0=int(np.ceil(size_0*proportion))
+    print(fold_idx)
+    if fold_idx <nb_bins-1:
+        test_pos_1=pos_1[fold_idx*per_bins_1:(fold_idx+1)*per_bins_1]
+        test_pos_0=pos_0[fold_idx*per_bins_0:(fold_idx+1)*per_bins_0]
+    else:
+        print('coucou')
+        test_pos_1=pos_1[fold_idx*per_bins_1:]
+        test_pos_0=pos_0[fold_idx*per_bins_0:]
+    test_mask=np.array([False]*size)
+    #setting the position of label 1
+    test_mask[test_pos_1]=True
+    #setting the position of the other label
+    test_mask[test_pos_0]=True
+    train_mask=np.logical_not(test_mask)
+    return train_mask,test_mask
+
+def one_fold_validation(model,data_y,data_x,lambda_,initial_w,max_iter,gamma,train_mask,test_mask):
+
+
+    train_x=data_x[train_mask,:]
+    train_y=data_y[train_mask]
+    test_x=data_x[test_mask,:]
+#        train_x,test_x=fill_unknown_with_column_mean_train_test(train_x, test_x)
+#        train_x,mu_x,sigma_x=normal_train(train_x)
+#        train_y,mu_y,sigma_y=normal_train(data_y[train_mask])
+
+    test_y=data_y[test_mask]
+#        test_x=normal_test(test_x,mu_x,sigma_x)
+#        test_y=normal_test(test_y,mu_y,sigma_y)
+    w,train_loss=model(train_y,train_x,lambda_,initial_w, max_iter,gamma)
+    test_loss=compute_loss(test_y,test_x,w)
+    return w,train_loss,test_loss
+    
+
+
 def cross_validation(model,data_y,data_x,lambda_,initial_w,max_iter,gamma,proportion):
     nb_bins=int(1./proportion)
     size=len(data_y)
-    train_loss=np.zeros(size)
-    test_loss=np.zeros(size)
-    per_bins=int(np.ceil((nb_bins*proportion)))
-    for i in range(nb_bins-1):
+    train_loss=np.zeros(nb_bins)
+    test_loss=np.zeros(nb_bins)
+    per_bins=int(np.ceil((size*proportion)))
+    for i in range(nb_bins):
 
-        test_mask=np.array([False]*size)
-        test_mask[i*per_bins:(i+1)*per_bins]=True
-        
-        train_mask=np.logical_not(np.zeros(size),test_mask)
-        train_x=data_x[train_mask,:]
-        train_y=data_y[train_mask]
-        test_x=data_x[test_mask,:]
-        test_y=data_y[test_mask]
-        w,train_loss[i]=model(train_y,train_x,lambda_,initial_w, max_iter,gamma)
-        test_loss[i]=compute_loss(test_y,test_x,w)
-    return np.mean(train_loss), np.mean(test_loss),np.std(train_loss),np.std(test_loss)
+        train_mask,test_mask=equipartition(data_y,proportion,i)
+        w,train_loss[i],test_loss[i]=one_fold_validation(model,data_y,data_x,lambda_,initial_w,max_iter,gamma,train_mask,test_mask)
+        print(test_loss[i])
+    print(test_mask)
+
+
+    return w,np.mean(train_loss), np.mean(test_loss),np.std(train_loss),np.std(test_loss)
+
+def normal_train(x):
+    mu=x.mean(axis=0)
+    std=x.std(axis=0)
+    return (x-mu)/(std+1e-17),mu,std
+def  normal_test(x,mu,std):
+    return (x-mu)/(std+1e-17)
