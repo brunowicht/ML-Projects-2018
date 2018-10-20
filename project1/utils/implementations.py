@@ -183,7 +183,10 @@ def one_fold_validation(model,data_y,data_x,lambda_,initial_w,max_iter,gamma,tra
     test_y=data_y[test_mask]
 #        test_x=normal_test(test_x,mu_x,sigma_x)
 #        test_y=normal_test(test_y,mu_y,sigma_y)
-    w,train_loss=model(train_y,train_x,lambda_,initial_w, max_iter,gamma)
+    if model==least_squares:
+        w,train_loss=model(train_y,train_x)
+    else:
+        w,train_loss=model(train_y,train_x,lambda_,initial_w, max_iter,gamma)
     test_loss=compute_loss(test_y,test_x,w)
     return w,train_loss,test_loss
     
