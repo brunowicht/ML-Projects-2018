@@ -154,12 +154,12 @@ def equipartition(data_y,proportion,fold_idx):
     size=len(data_y)
     per_bins_1=int(np.ceil(size_1*proportion))
     per_bins_0=int(np.ceil(size_0*proportion))
-    print(fold_idx)
+#    print(fold_idx)
     if fold_idx <nb_bins-1:
         test_pos_1=pos_1[fold_idx*per_bins_1:(fold_idx+1)*per_bins_1]
         test_pos_0=pos_0[fold_idx*per_bins_0:(fold_idx+1)*per_bins_0]
     else:
-        print('coucou')
+#        print('coucou')
         test_pos_1=pos_1[fold_idx*per_bins_1:]
         test_pos_0=pos_0[fold_idx*per_bins_0:]
     test_mask=np.array([False]*size)
@@ -198,8 +198,8 @@ def cross_validation(model,data_y,data_x,lambda_,initial_w,max_iter,gamma,propor
 
         train_mask,test_mask=equipartition(data_y,proportion,i)
         w,train_loss[i],test_loss[i]=one_fold_validation(model,data_y,data_x,lambda_,initial_w,max_iter,gamma,train_mask,test_mask)
-        print(test_loss[i])
-    print(test_mask)
+        #print(test_loss[i])
+#    print(test_mask)
 
 
     return w,np.mean(train_loss), np.mean(test_loss),np.std(train_loss),np.std(test_loss)
@@ -211,15 +211,47 @@ def normal_train(x):
 def  normal_test(x,mu,std):
     return (x-mu)/(std+1e-17)
 
-def next_feature(model,data_y,data_x,lambda_,initial_w,max_iter,gamma,proportion,fixed_features):
+def next_feature(model,data_y,data_x,lambda_,max_iter,gamma,proportion,fixed_features):
+    """
+    helper function for feature_wrapping
+    given a set a fixed feature,
+    returns a supplementary feature that has the best validation/test, working with
+    the other ones
+    """
     nb_features=data_x.shape[1]
-    test_error=[1000]*nb_features
+    best_validation_loss=1000.
+    best_new_feature=nb_features
     for i in range(nb_features):
+        #recall that we don't touch the fixed features
         if i not in fixed_features:
+#            print(i)
             features=fixed_features+[i]
-            regressor=np.ones((len(data_y),len(fixed_features)+1))
+            regressor=np.ones((len(data_y),len(features)+1))
+#            print(regressor.shape)
+#            print(data_x[:,np.array(features)].shape)
             regressor[:,1:]=data_x[:,np.array(features)]
-            a_,b_,test_error[i]=cross_validation(model,data_y,regressor,lambda_,initial_w,max_iter,gamma,proportion)
+            initial_w=np.zeros(len(features)+1)
+            a_,b_,test_error,d_,e_=cross_validation(model,data_y,regressor,lambda_,initial_w,max_iter,gamma,proportion)
+            if test_error<best_validation_loss:
+                best_validation_loss=test_error
+                best_new_feature=i
+    return fixed_features +[best_new_feature],best_validation_loss
+
+def feature_wrapping(model,data_y,data_x,lambda_,max_iter,gamma,proportion,file_path):
+    feature_list=[]
+    best_list=[-1]
+    best_loss=1000
+    max_nb_of_features=data_x.shape[1]
+    output_file=open(file_path,'w')
+    for i in range(max_nb_of_features):
+        feature_list,loss=next_feature(model,data_y,data_x,lambda_,max_iter,gamma,proportion,feature_list)
+        print(str((loss,feature_list)), file=output_file)
+        print(str((loss,feature_list)))
+        if loss < best_loss:
+            best_loss=loss
+            best_list=feature_list
+    return best_loss,best_list
+        
     
             
 
