@@ -6,7 +6,7 @@ Created on Thu Oct 18 12:51:24 2018
 """
 
 import numpy as np
-
+import utils.cleaning as cln
 import numpy as np
 
 def calculate_mse(e):
@@ -170,7 +170,7 @@ def equipartition(data_y,proportion,fold_idx):
     train_mask=np.logical_not(test_mask)
     return train_mask,test_mask
 
-def one_fold_validation(model,data_y,data_x,lambda_,initial_w,max_iter,gamma,train_mask,test_mask):
+def one_fold_validation(model,data_y,data_x,lambda_,initial_w,max_iter,gamma,train_mask,test_mask,raw_data=False):
 
 
     train_x=data_x[train_mask,:]
@@ -181,10 +181,18 @@ def one_fold_validation(model,data_y,data_x,lambda_,initial_w,max_iter,gamma,tra
 #        train_y,mu_y,sigma_y=normal_train(data_y[train_mask])
 
     test_y=data_y[test_mask]
+    
+    if raw_data:
+        train_x,mean,std = cln.standardize_train(train_x)
+        test_x = cln.standardize_test(test_x,mean,std)
+        
+    
 #        test_x=normal_test(test_x,mu_x,sigma_x)
 #        test_y=normal_test(test_y,mu_y,sigma_y)
     if model==least_squares:
         w,train_loss=model(train_y,train_x)
+    elif model==ridge_regression:
+        w,train_loss = model(train_y,train_x,lambda_)
     else:
         w,train_loss=model(train_y,train_x,lambda_,initial_w, max_iter,gamma)
     test_loss=compute_loss(test_y,test_x,w)
@@ -192,7 +200,10 @@ def one_fold_validation(model,data_y,data_x,lambda_,initial_w,max_iter,gamma,tra
     
 
 
-def cross_validation(model,data_y,data_x,lambda_,initial_w,max_iter,gamma,proportion):
+def cross_validation(model,data_y,data_x,lambda_,initial_w,max_iter,gamma,proportion,raw_data=False):
+    
+    
+    
     nb_bins=int(1./proportion)
     size=len(data_y)
     train_loss=np.zeros(nb_bins)
