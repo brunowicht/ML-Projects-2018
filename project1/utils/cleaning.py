@@ -18,11 +18,15 @@ def column_replace_invalid_by_mean(col):
 def clean_and_normalize_train_column(col):
     col_copy=col.copy()
     relevant_data=col_copy[col_copy !=-999]
+    print(relevant_data)
     mean=np.mean(relevant_data)
     std=np.std(relevant_data)
     col_copy[col_copy==-999]=mean
     print(mean)
+    print(std)
+    print(col_copy)
     ret=(col_copy-mean)/std
+    print(col_copy)
     return ret, mean ,std
 def clean_and_normalize_test_column(col,mean,std):
     col_copy=col.copy()
