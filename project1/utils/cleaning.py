@@ -35,6 +35,36 @@ def clean_and_normalize_test_column(col,mean,std):
     ret=(col_copy-mean)/std
     return ret
 
+def expand_features_degree2(dx):
+    res = list()
+    for x in dx:
+        new = list(x)
+        for i in range(len(x)):
+            for j in range(i,len(x)):
+                new.append(x[i] * x[j])
+        res.append(new)
+    return np.array(res)
+
+def expand_features_degree3(dx):
+    res = list()
+    a = 0
+    new = list()
+
+    for x in dx:
+        a +=1 
+        new = []
+        for i in range(len(x)):
+            for j in range(i,len(x)):
+                new.append(x[i] * x[j])
+        for i in range(len(x)):
+            for j in range(i,len(x)):
+                for k in range(j, len(x)):
+                    new.append(x[i] * x[j] * x[k])
+        res.append(new)
+        if a % 1000 == 0:
+            print(a)
+    return np.array(res)
+
 
 #the next function bugs a bit, test it with small matrix containing -999 kiss kisss Nicolas
 
@@ -76,14 +106,19 @@ def load_clean_standardize_train(file):
     data = load_csv_data(file)
     data_y = data[0]
     ids = data[2]
-    data_x, means, stds = standardize_train(fill_unknown_with_column_mean(data[1]))
+    data_x = fill_unknown_with_column_mean(data[1])
+    data_x, means, stds = standardize_train(data_x)
+    data_x = expand_features_degree2(data_x)
     return data_x, data_y, ids, means, stds
 
 def load_clean_standardize_test(file, means, stds):
     data = load_csv_data(file)
     data_y = data[0]
     ids = data[2]
-    data_x = standardize_test(fill_unknown_with_column_mean(data[1]), means, stds)
+    data_x = fill_unknown_with_column_mean(data[1])
+    
+    data_x = standardize_test(data_x, means, stds)
+    data_x = expand_features_degree2(data_x)
     return data_x, data_y, ids
 
 
