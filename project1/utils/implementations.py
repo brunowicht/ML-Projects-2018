@@ -26,6 +26,16 @@ def compute_loss(y, tx, w):
     """
     e = y - tx.dot(w)
     return calculate_mse(e)
+def compute_loss_logistic(y, tx, w):
+    """
+    needs a y that is 1 or 0
+    categorical cross entropy
+    """
+    activation=tx.dot(w)
+    size=len(y)
+    y_hat=sigmoid(activation)
+    
+    return -np.sum(y*np.log(y_hat)+(1-y)*np.log(1-y_hat))/size 
 
 def compute_gradient(y,tx,w):
     e = y - tx.dot(w)
@@ -117,7 +127,7 @@ def logistic_regression(y,tx,initial_w,max_iter,gamma):
         delta=tx.T.dot(derivative_of_cross_entropy_error(y,activations))/len(y)
         w=w-gamma*delta
         activations=tx.dot(w)
-        loss = compute_loss(y, tx, w)
+        loss = compute_loss_logistic(y, tx, w)
     return w, loss
 
 def reg_logistic_regression(y,tx,lambda_,initial_w,max_iter,gamma):
@@ -129,10 +139,10 @@ def reg_logistic_regression(y,tx,lambda_,initial_w,max_iter,gamma):
     loss = 10000
     for i in range(max_iter):
         delta=tx.T.dot(derivative_of_cross_entropy_error(y,activations))/len(y)+2*lambda_*w
-
+        #print(gamma*np.linalg.norm(delta))
         w=w-gamma*delta
         activations=tx.dot(w)
-        loss = compute_loss(y,tx,w)
+        loss = compute_loss_logistic(y,tx,w)
     return w, loss
 
 
@@ -176,6 +186,7 @@ def one_fold_validation(model,data_y,data_x,lambda_,initial_w,max_iter,gamma,tra
     train_x=data_x[train_mask,:]
     train_y=data_y[train_mask]
     test_x=data_x[test_mask,:]
+#    cln.clean_and_normalize(train_x,test_x)
 #        train_x,test_x=fill_unknown_with_column_mean_train_test(train_x, test_x)
 #        train_x,mu_x,sigma_x=normal_train(train_x)
 #        train_y,mu_y,sigma_y=normal_train(data_y[train_mask])
@@ -191,11 +202,12 @@ def one_fold_validation(model,data_y,data_x,lambda_,initial_w,max_iter,gamma,tra
 #        test_y=normal_test(test_y,mu_y,sigma_y)
     if model==least_squares:
         w,train_loss=model(train_y,train_x)
-    elif model==ridge_regression:
-        w,train_loss = model(train_y,train_x,lambda_)
+        test_loss=compute_loss(test_y,test_x,w)
+    elif model==reg_logistic_regression:
+        w,train_loss = model(train_y,train_x,lambda_,initial_w,max_iter,gamma)
+        test_loss=compute_loss_logistic(test_y,test_x,w)
     else:
         w,train_loss=model(train_y,train_x,lambda_,initial_w, max_iter,gamma)
-    test_loss=compute_loss(test_y,test_x,w)
     return w,train_loss,test_loss
     
 
