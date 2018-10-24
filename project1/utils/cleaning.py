@@ -6,7 +6,7 @@ Created on Thu Oct 18 12:17:24 2018
 """
 
 import numpy as np
-from utils.proj1_helpers import load_csv_data
+from proj1_helpers import load_csv_data
 
 
 
