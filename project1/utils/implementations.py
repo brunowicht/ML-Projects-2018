@@ -7,6 +7,7 @@ Created on Thu Oct 18 12:51:24 2018
 
 import numpy as np
 import utils.cleaning as cln
+import utils.proj1_helpers as hlp
 import numpy as np
 
 def calculate_mse(e):
@@ -26,6 +27,9 @@ def compute_loss(y, tx, w):
     """
     e = y - tx.dot(w)
     return calculate_mse(e)
+
+def compute_accuracy(y,y_pred):
+    return np.sum(np.heaviside(y*y_pred,0.5))/len(y)
 
 def compute_gradient(y,tx,w):
     e = y - tx.dot(w)
@@ -114,9 +118,12 @@ def logistic_regression(y,tx,initial_w,max_iter,gamma):
 
     loss = 10000
     for i in range(max_iter):
+        print(activations)
         delta=tx.T.dot(derivative_of_cross_entropy_error(y,activations))/len(y)
         w=w-gamma*delta
+        #print(np.linalg.norm(gamma*delta))
         activations=tx.dot(w)
+        
         loss = compute_loss(y, tx, w)
     return w, loss
 
@@ -128,9 +135,11 @@ def reg_logistic_regression(y,tx,lambda_,initial_w,max_iter,gamma):
     w=initial_w
     loss = 10000
     for i in range(max_iter):
+        print(np.max(activations))
         delta=tx.T.dot(derivative_of_cross_entropy_error(y,activations))/len(y)+2*lambda_*w
 
         w=w-gamma*delta
+        #print(np.linalg.norm(gamma*delta))
         activations=tx.dot(w)
         loss = compute_loss(y,tx,w)
     return w, loss
@@ -196,7 +205,9 @@ def one_fold_validation(model,data_y,data_x,lambda_,initial_w,max_iter,gamma,tra
     else:
         w,train_loss=model(train_y,train_x,lambda_,initial_w, max_iter,gamma)
     test_loss=compute_loss(test_y,test_x,w)
-    return w,train_loss,test_loss
+    y_pred =hlp.predict_labels(w,test_x,model==reg_logistic_regression)
+    test_error=1-compute_accuracy(test_y,y_pred)
+    return w,train_loss,test_loss,test_error
     
 
 
@@ -208,15 +219,17 @@ def cross_validation(model,data_y,data_x,lambda_,initial_w,max_iter,gamma,propor
     size=len(data_y)
     train_loss=np.zeros(nb_bins)
     test_loss=np.zeros(nb_bins)
+    #classification error
+    test_error=np.zeros(nb_bins)
     for i in range(nb_bins):
 
         train_mask,test_mask=equipartition(data_y,proportion,i)
-        w,train_loss[i],test_loss[i]=one_fold_validation(model,data_y,data_x,lambda_,initial_w,max_iter,gamma,train_mask,test_mask)
+        w,train_loss[i],test_loss[i],test_error[i]=one_fold_validation(model,data_y,data_x,lambda_,initial_w,max_iter,gamma,train_mask,test_mask)
         #print(test_loss[i])
 #    print(test_mask)
 
 
-    return w,np.mean(train_loss), np.mean(test_loss),np.std(train_loss),np.std(test_loss)
+    return w,np.mean(train_loss), np.mean(test_loss),np.mean(test_error),np.std(train_loss),np.std(test_loss),np.std(test_error)
 
 def normal_train(x):
     mu=x.mean(axis=0)
@@ -245,7 +258,7 @@ def next_feature(model,data_y,data_x,lambda_,max_iter,gamma,proportion,fixed_fea
 #            print(data_x[:,np.array(features)].shape)
             regressor[:,1:]=data_x[:,np.array(features)]
             initial_w=np.zeros(len(features)+1)
-            a_,b_,test_error,d_,e_=cross_validation(model,data_y,regressor,lambda_,initial_w,max_iter,gamma,proportion)
+            a_,b_,c_,test_error,d_,e_,f_=cross_validation(model,data_y,regressor,lambda_,initial_w,max_iter,gamma,proportion)
             if test_error<best_validation_loss:
                 best_validation_loss=test_error
                 best_new_feature=i

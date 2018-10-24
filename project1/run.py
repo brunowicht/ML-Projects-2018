@@ -11,16 +11,17 @@ from utils.proj1_helpers import *
 import numpy as np
 
 lambda_ = 0.8
-max_iters = 2
-gamma = 0.0035
+max_iters = 1000
+gamma = 0.3
 
 
 # Load clean and standardize the data
-data_x, data_y, train_ids, means, stds = load_clean_standardize_train("C:/Users/Test/train.csv")
+#data_x, data_y, train_ids, means, stds = load_clean_standardize_train("train.csv")
 print("Cleaning done")
+print(data_x.shape)
 
-gammas = np.linspace(0.0004, 0.02, 50)
-lambdas = np.linspace(0.0,10.,11)
+gammas = np.linspace(0.000001, 0.000004, 4)
+lambdas = np.linspace(0.0000,0.0000002,21)
 best_gamma = 0.00
 best_loss = 1000
 best_lambda = 0.00
@@ -42,6 +43,11 @@ for l in lambdas:
 print("done")        
 print("best loss: "+str(best_loss))
 print("best lambda: "+str(best_lambda))
-#test_x, test_y, test_ids = load_clean_standardize_test("../../MLData2018/test.csv", means, stds)
-#y_pred = predict_labels(w, test_x, logistic=False)
-#create_csv_submission(test_ids, y_pred, "submission.csv")
+w,loss = ridge_regression(data_y, regressor, best_lambda)
+
+
+test_x, test_y, test_ids = load_clean_standardize_test("../../MLData2018/test.csv", means, stds)
+regressor=np.ones((test_x.shape[0],test_x.shape[1]+1))
+regressor[:,1:]=test_x
+y_pred = predict_labels(w, regressor, logistic=False)
+create_csv_submission(test_ids, y_pred, "submission.csv")
