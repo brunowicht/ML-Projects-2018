@@ -8,7 +8,18 @@ Created on Thu Oct 18 12:17:24 2018
 import numpy as np
 from utils.proj1_helpers import load_csv_data
 
+def find_999_columns(dx):
+    tx = dx.transpose()
+    cols = []
+    for i in range(len(tx)):
+        if -999 in tx[i]:
+            cols.append(i)
+    return cols
 
+def add_columns_for_999(dx):
+    d999 = find_999_columns(dx)
+    return np.concatenate((dx, (dx[:,d999]==-999).astype(int)), axis=1)
+        
 
 def column_replace_invalid_by_mean(col):
     mean = np.mean(col[col != -999])
@@ -37,12 +48,17 @@ def clean_and_normalize_test_column(col,mean,std):
 
 def expand_features_degree2(dx):
     res = list()
+    a = 0
     for x in dx:
+        a+=1
         new = list(x)
         for i in range(len(x)):
             for j in range(i,len(x)):
                 new.append(x[i] * x[j])
         res.append(new)
+        if a % 1000 == 0:
+            print(a)
+    print("expand done")
     return np.array(res)
 
 def expand_features_degree3(dx):
@@ -92,6 +108,8 @@ def standardize_train(dx):
         mean = d[i].mean()
         means.append(mean)
         std = d[i].std()
+        if std==0:
+            std = 1
         stds.append(std)
         d[i] = (d[i] - mean) / std
     return d.transpose(), means, stds
@@ -106,7 +124,8 @@ def load_clean_standardize_train(file):
     data = load_csv_data(file)
     data_y = data[0]
     ids = data[2]
-    data_x = fill_unknown_with_column_mean(data[1])
+    data_x = add_columns_for_999(data[1])
+    data_x = fill_unknown_with_column_mean(data_x)
     data_x, means, stds = standardize_train(data_x)
     data_x = expand_features_degree2(data_x)
     return data_x, data_y, ids, means, stds
@@ -115,8 +134,8 @@ def load_clean_standardize_test(file, means, stds):
     data = load_csv_data(file)
     data_y = data[0]
     ids = data[2]
-    data_x = fill_unknown_with_column_mean(data[1])
-    
+    data_x = add_columns_for_999(data[1])
+    data_x = fill_unknown_with_column_mean(data_x)    
     data_x = standardize_test(data_x, means, stds)
     data_x = expand_features_degree2(data_x)
     return data_x, data_y, ids
