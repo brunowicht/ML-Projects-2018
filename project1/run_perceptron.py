@@ -15,28 +15,31 @@ import utils.perceptron as prc
 
 
 # Load clean and standardize the data
-#data_x, data_y, train_ids, means, stds = load_clean_standardize_train("C:/Users/Test/train.csv")
+data_x, data_y, train_ids, means, stds = load_clean_standardize_train("C:/Users/Test/train.csv")
 print("Cleaning done")
 print(data_x.shape)
 best_acc=1.1
+best_gamma=10.
 best_w=np.array([0.]*496)
-#for i in np.linspace(0.001,0.003,21):
-#    #TODO add prc.
-#    w=train_minibatch(data_y,data_x,np.array([0.]*496),150,i,20000)
-#    print("training done ")
-#    y_hat=prc.predictions(data_x[:250000],w)
-#    matches=np.heaviside(y_hat*data_y,.5)
-#    
-#    acc=np.sum(matches)/250000
-#    print(acc)
-#    print(i)
-#    if acc > best_acc:
-#        best_acc=acc
-#        best_w=w
-#print(best_acc)
-#1e-6 is the best one for sgd
+for i in np.logspace(-8,0,9):
 
-#final_w=bagging(100,data_y,data_x,np.array([.0]*496),250000,1e-6)
+    w=prc.train(data_y,data_x,np.array([0.]*496),250000,i)
+    print("training done ")
+    y_hat=prc.predictions(data_x[:250000],w)
+    matches=np.heaviside(y_hat*data_y,.5)
+    
+    acc=np.sum(matches)/250000
+    print(acc)
+    print(i)
+    if acc > best_acc:
+        best_acc=acc
+        best_gamma=gamma
+        best_w=w
+print(best_acc)
+print(best_gamma)
+#1e-6 is the best one for sgd
+w=prc.train(data_y,data_x,np.array([0.]*496),1500,1e-6)
+final_w=bagging(100,data_y,data_x,np.array([.0]*496),250000,best_gamma)
 print(np.sum(np.heaviside(data_y*prc.predictions(data_x[:250000],final_w),.5))/len(data_y))
 
 #test_x, test_y, test_ids = load_clean_standardize_test("C:/Users/Test/test.csv", means, stds)
