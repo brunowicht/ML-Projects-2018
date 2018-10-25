@@ -28,6 +28,12 @@ def compute_loss(y, tx, w):
     e = y - tx.dot(w)
     return calculate_mse(e)
 
+def compute_categorical_cross_entropy(y,tx,w):
+    
+    activation=tx.dot(w)
+    sigma=sigmoid(activation)
+    return -np.sum(y*np.log(sigma)+(1-y)*np.log(1-sigma))
+
 def compute_accuracy(y,y_pred):
     return np.sum(np.heaviside(y*y_pred,0.5))/len(y)
 
@@ -141,9 +147,20 @@ def reg_logistic_regression(y,tx,lambda_,initial_w,max_iter,gamma):
         w=w-gamma*delta
         #print(np.linalg.norm(gamma*delta))
         activations=tx.dot(w)
-        loss = compute_loss(y,tx,w)
+    loss = compute_cateorical_cross_entropy(y,tx,w)
     return w, loss
 
+def reg_logistic_regression_SGD(y,tx,lambda_,initial_w,max_iter,gamma):
+    """
+    recommand to use shuffling for every new full round
+    """
+    w=initial_w
+    for i in range(max_iter):
+        activation=tx[i].dot(w)
+        delta=derivative_of_cross_entropy_error(y[i],activation)*tx[i]
+        w=w-gamma*delta
+    loss=compute_categorical_cross_entropy(y,tx,w)
+    return w,loss
 
 def equipartition(data_y,proportion,fold_idx):
     """
@@ -207,7 +224,8 @@ def one_fold_validation(model,data_y,data_x,lambda_,initial_w,max_iter,gamma,tra
     test_loss=compute_loss(test_y,test_x,w)
     y_pred =hlp.predict_labels(w,test_x,model==reg_logistic_regression)
     test_error=1-compute_accuracy(test_y,y_pred)
-    return w,train_loss,test_loss,test_error
+    train_error=1-compute_accuracy(train_y,hlp.predict_labels(w,train_x,model==reg_logistic_regression))
+    return w,train_loss,test_loss,test_error,train_error
     
 
 
@@ -221,15 +239,16 @@ def cross_validation(model,data_y,data_x,lambda_,initial_w,max_iter,gamma,propor
     test_loss=np.zeros(nb_bins)
     #classification error
     test_error=np.zeros(nb_bins)
+    train_error=np.zeros(nb_bins)
     for i in range(nb_bins):
 
         train_mask,test_mask=equipartition(data_y,proportion,i)
-        w,train_loss[i],test_loss[i],test_error[i]=one_fold_validation(model,data_y,data_x,lambda_,initial_w,max_iter,gamma,train_mask,test_mask)
+        w,train_loss[i],test_loss[i],test_error[i],train_error[i]=one_fold_validation(model,data_y,data_x,lambda_,initial_w,max_iter,gamma,train_mask,test_mask)
         #print(test_loss[i])
 #    print(test_mask)
 
 
-    return w,np.mean(train_loss), np.mean(test_loss),np.mean(test_error),np.std(train_loss),np.std(test_loss),np.std(test_error)
+    return w,np.mean(train_loss), np.mean(test_loss),np.mean(test_error),np.mean(train_error),np.std(train_loss),np.std(test_loss),np.std(test_error)
 
 def normal_train(x):
     mu=x.mean(axis=0)
