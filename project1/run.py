@@ -16,7 +16,7 @@ gamma = 0.3
 
 
 # Load clean and standardize the data
-#data_x, data_y, train_ids, means, stds = load_clean_standardize_train("../../MLData2018/train.csv")
+#data_x, data_y, train_ids, means, stds = load_clean_standardize_train("train.csv")
 print("Cleaning done")
 print(data_x.shape)
 
