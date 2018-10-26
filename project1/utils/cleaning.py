@@ -6,7 +6,7 @@ Created on Thu Oct 18 12:17:24 2018
 """
 
 import numpy as np
-from proj1_helpers import load_csv_data
+from utils.proj1_helpers import load_csv_data
 
 def find_999_columns(dx):
     tx = dx.transpose()
@@ -22,7 +22,7 @@ def add_columns_for_999(dx):
         
 
 def column_replace_invalid_by_mean(col):
-    mean = np.mean(col[col != -999])
+    mean = np.median(col[col != -999])
     col[col == -999] = mean
     return col
 
@@ -30,7 +30,7 @@ def clean_and_normalize_train_column(col):
     col_copy=col.copy()
     relevant_data=col_copy[col_copy !=-999]
     print(relevant_data)
-    mean=np.mean(relevant_data)
+    mean=np.median(relevant_data)
     std=np.std(relevant_data)
     col_copy[col_copy==-999]=mean
     print(mean)
@@ -105,7 +105,7 @@ def standardize_train(dx):
     means = []
     stds = []
     for i in range(len(d)):
-        mean = d[i].mean()
+        mean = np.median(d[i])
         means.append(mean)
         std = d[i].std()
         if std==0:
@@ -120,24 +120,29 @@ def standardize_test(dx, means, stds):
         d[i] = (d[i] - means[i])/stds[i]
     return d.transpose()
 
-def load_clean_standardize_train(file):
+def load_clean_standardize_train(file,expansion=True,replace=True):
     data = load_csv_data(file)
     data_y = data[0]
     ids = data[2]
-    data_x = add_columns_for_999(data[1])
+    data_x = data[1]
+    if replace:
+        data_x = add_columns_for_999(data_x)
     data_x = fill_unknown_with_column_mean(data_x)
     data_x, means, stds = standardize_train(data_x)
-    data_x = expand_features_degree2(data_x)
+    if expansion : 
+        data_x = expand_features_degree2(data_x)
     return data_x, data_y, ids, means, stds
 
-def load_clean_standardize_test(file, means, stds):
+def load_clean_standardize_test(file, means, stds,expansion=True,replace=True):
     data = load_csv_data(file)
     data_y = data[0]
     ids = data[2]
-    data_x = add_columns_for_999(data[1])
+    if replace:
+        data_x = add_columns_for_999(data[1])
     data_x = fill_unknown_with_column_mean(data_x)    
     data_x = standardize_test(data_x, means, stds)
-    data_x = expand_features_degree2(data_x)
+    if expansion:
+        data_x = expand_features_degree2(data_x)
     return data_x, data_y, ids
 
 

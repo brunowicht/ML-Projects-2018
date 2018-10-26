@@ -76,7 +76,9 @@ def least_squares_SGD(y,tx,initial_w,max_iters,gamma):
         
 def least_squares(y,tx):
     
-    w = np.linalg.lstsq(tx,y)[0]
+    a = tx.T.dot(tx)
+    b = tx.T.dot(y)
+    w = np.linalg.solve(a, b)
     loss = compute_loss(y,tx,w)
     return w , loss
     
@@ -124,7 +126,7 @@ def logistic_regression(y,tx,initial_w,max_iter,gamma):
 
     loss = 10000
     for i in range(max_iter):
-        print(activations)
+#        print(activations)
         delta=tx.T.dot(derivative_of_cross_entropy_error(y,activations))/len(y)
         w=w-gamma*delta
         #print(np.linalg.norm(gamma*delta))
@@ -141,13 +143,12 @@ def reg_logistic_regression(y,tx,lambda_,initial_w,max_iter,gamma):
     w=initial_w
     loss = 10000
     for i in range(max_iter):
-        print(np.max(activations))
         delta=tx.T.dot(derivative_of_cross_entropy_error(y,activations))/len(y)+2*lambda_*w
 
         w=w-gamma*delta
         #print(np.linalg.norm(gamma*delta))
         activations=tx.dot(w)
-    loss = compute_cateorical_cross_entropy(y,tx,w)
+    loss = compute_categorical_cross_entropy(y,tx,w)
     return w, loss
 
 def reg_logistic_regression_SGD(y,tx,lambda_,initial_w,max_iter,gamma):
@@ -180,7 +181,6 @@ def equipartition(data_y,proportion,fold_idx):
     size=len(data_y)
     per_bins_1=int(np.ceil(size_1*proportion))
     per_bins_0=int(np.ceil(size_0*proportion))
-#    print(fold_idx)
     if fold_idx <nb_bins-1:
         test_pos_1=pos_1[fold_idx*per_bins_1:(fold_idx+1)*per_bins_1]
         test_pos_0=pos_0[fold_idx*per_bins_0:(fold_idx+1)*per_bins_0]

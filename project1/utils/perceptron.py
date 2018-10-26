@@ -8,7 +8,7 @@ import numpy as np
 import utils.cleaning as cln
 
 def train(y,tx,w,k,gamma):
-    x=-np.ones((496,))
+    x=-np.ones((tx.shape[1]+1,))
 
     for i in range(k):
 #        if i > 249000 and i< 250100:
@@ -36,7 +36,7 @@ def online_expansion_3d(x):
     return np.array([-1.]+list(x)+d2x+d3x)
 
 def predictions(tx,w):
-    x=-np.ones((496,))
+    x=-np.ones((tx.shape[1]+1,))
     
     y_pred=np.zeros((tx.shape[0],))
     
