@@ -9,29 +9,43 @@ from utils.cleaning import *
 import utils.implementations as impl
 import utils.proj1_helpers
 
+
+
 import numpy as np
+import pandas as pd
+import seaborn as sns
 
 # Load clean and standardize the data
-data_x, data_y, ids = load_raw("../../train.csv",rand=True)
+#data_x, data_y, ids <= load_raw("../../train.csv",rand=True)
+#df = pd.DataFrame(data_x)
+#
+#df["y"] = data_y
+#print("Done loading df")
 
 
+#sns.countplot(x=0,hue='y',data=df)
+
+plot = sns.pairplot(df,hue='y')
+print("plot done ")
+plot.savefig("pairplot_hue.png")
+print("Finished saving plot")
 #print(data_x)
 #print(data_y)
+#
+#lambda_ = 0.0001
+#max_iter =50 
+#proportion=0.2
+#gamma = 0.5
+#model = impl.reg_logistic_regression
+#w_init = np.zeros(data_x.shape[1])
 
-lambda_ = 0.0001
-max_iter =50 
-proportion=0.2
-gamma = 0.5
-model = impl.reg_logistic_regression
-w_init = np.zeros(data_x.shape[1])
-
-
-w,m_train_loss, m_test_loss,std_train_loss,std_test_loss=impl.cross_validation(model,data_y,data_x,lambda_,w_init,max_iter,gamma,proportion,raw_data=True)
-print(w)
-print(m_train_loss)
-print(m_test_loss)
-
-clean_data_x, clean_data_y, clean_ids, means, stds = load_clean_standardize_train("../../data.csv")
+#
+#w,m_train_loss, m_test_loss,std_train_loss,std_test_loss=impl.cross_validation(model,data_y,data_x,lambda_,w_init,max_iter,gamma,proportion,raw_data=True)
+#print(w)
+#print(m_train_loss)
+#print(m_test_loss)
+#
+#clean_data_x, clean_data_y, clean_ids, means, stds = load_clean_standardize_train("../../data.csv")
 
 
 # 0.389916
