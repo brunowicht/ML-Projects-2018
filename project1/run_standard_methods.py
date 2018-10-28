@@ -12,6 +12,9 @@ from utils.cleaning import *
 from utils.implementations import * 
 from utils.proj1_helpers import * 
 
+import matplotlib.pyplot as plt
+
+
 
 
 import numpy as np
@@ -21,7 +24,7 @@ import seaborn as sns
 
 
 # Load clean and standardize the data
-#data_x, data_y, train_ids, means, stds = load_clean_standardize_train("../../train.csv",expansion=False, replace=False )
+data_x, data_y, train_ids, means, stds = load_clean_standardize_train("../../train.csv",expansion=False, replace=False )
 print("Cleaning done")
 print(data_x.shape)
 
@@ -39,9 +42,11 @@ def do_standard_run(data_y,data_x):
     
     ws = []
     losses = []
+    accuracies = []
     w_ls, loss_ls = least_squares(data_y,data_x)
     ws.append(w_ls)
     losses.append(loss_ls)
+    accuracies.append(compute_accuracy(data_y,predict_labels(w_ls,data_x)))
     print("Least square method : %f loss" % loss_ls)
     initial_w = np.zeros(data_x.shape[1])
     gamma = np.linspace(0,1,20)
@@ -59,6 +64,7 @@ def do_standard_run(data_y,data_x):
     ws.append(w_ls_gd)
     losses.append(loss_ls_gd)
     w_ls_sgd = np.zeros(data_x.shape[1])
+    accuracies.append(compute_accuracy(data_y,predict_labels(w_ls_gd,data_x)))
     loss_ls_sgd = 1000
     for gamma_ in gamma:
         w_Curr, loss_Curr = least_squares_SGD(data_y,data_x,initial_w,100,gamma_)
@@ -73,6 +79,8 @@ def do_standard_run(data_y,data_x):
     
     lambdas = np.linspace(0,1,20)
     w_rr = np.zeros(data_x.shape[1])
+    
+    accuracies.append(compute_accuracy(data_y,predict_labels(w_ls_sgd,data_x)))
     loss_rr = 10000
     for lambda_ in lambdas:
         w_curr, loss_curr = ridge_regression(data_y,data_x,lambda_)
@@ -83,6 +91,8 @@ def do_standard_run(data_y,data_x):
     print("Ridge regression : %f loss" % loss_rr)
     ws.append(w_rr)
     losses.append(loss_rr)
+    
+    accuracies.append(compute_accuracy(data_y,predict_labels(w_rr,data_x)))
     w_lr = np.zeros(data_x.shape[1])
     loss_lr = 10000
     for gamma_ in gamma:
@@ -96,6 +106,7 @@ def do_standard_run(data_y,data_x):
     ws.append(w_lr)
     losses.append(loss_lr)
     
+    accuracies.append(compute_accuracy(data_y,predict_labels(w_lr,data_x)))
     w_rlr = np.zeros(data_x.shape[1])
     loss_rlr = 1000
     for gamma_ in gamma:
@@ -109,14 +120,24 @@ def do_standard_run(data_y,data_x):
     ws.append(w_rlr)
     losses.append(loss_rlr)
     
+    accuracies.append(compute_accuracy(data_y,predict_labels(w_rlr,data_x)))
+    
    
+    return ws,losses,accuracy    
+#    return ws[np.where(np.min(losses)==losses)[0][0]], losses[np.where(np.min(losses)==losses)[0][0]], accuracies[np.where(np.min(losses)==losses)[0][0]]
 
-    return ws[np.where(np.min(losses)==losses)[0][0]], losses[np.where(np.min(losses)==losses)[0][0]]
 
-
-w, loss = do_standard_run(data_y,data_x)
+w, loss,accuracy = do_standard_run(data_y,data_x)
 print(w)
 print(loss)
+print(accuracy)
+plt.plot(accuracy)
+
+plt.xticks([0,0.2,0.4,0.6,0.8,1.],["LS","LS GD", "LS SGD", "RR","LR","RLR"])
+
+plt.show()
+
+
 
 
 

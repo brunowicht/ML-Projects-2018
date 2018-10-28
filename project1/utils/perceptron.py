@@ -15,7 +15,7 @@ def train(y,tx,w,k,gamma):
 #            print(i%len(y))
         idx=i%len(y)
 #        x=online_expansion_3d(tx[idx])
-        x[1:]=tx[i]
+        x[1:]=tx[idx]
         w=w+gamma*(y[idx]-np.sign(x.dot(w)))*x
         w=w/np.sum(np.abs(w))
     return w
@@ -55,6 +55,8 @@ def bagging(nb_experiment,data_y,data_x,w,k,gamma):
     res_w=res_w/nb_experiment
     return res_w
     
+def bagging_t(data_y,data_x,w,k,gamma):
+    return bagging(10,data_y,data_x,w,k,gamma)
     
 
         

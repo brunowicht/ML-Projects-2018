@@ -8,6 +8,7 @@ Created on Thu Oct 18 12:51:24 2018
 import numpy as np
 import utils.cleaning as cln
 import utils.proj1_helpers as hlp
+import utils.perceptron as prc
 import numpy as np
 
 def calculate_mse(e):
@@ -112,7 +113,7 @@ def derivative_of_cross_entropy_error(y,activation):
           more on that on https://en.wikipedia.org/wiki/Cross_entropy#Cross-entropy_error_function_and_logistic_regression
     """
     sigma=sigmoid(activation)
-    return(-y*(1-sigma)+(1-y)*sigma)
+    return(sigma-y)
 
 def logistic_regression(y,tx,initial_w,max_iter,gamma):
     """
@@ -160,6 +161,7 @@ def reg_logistic_regression_SGD(y,tx,lambda_,initial_w,max_iter,gamma):
         activation=tx[i].dot(w)
         delta=derivative_of_cross_entropy_error(y[i],activation)*tx[i]
         w=w-gamma*delta
+        w=w/np.linalg.norm(w)
     loss=compute_categorical_cross_entropy(y,tx,w)
     return w,loss
 
@@ -218,7 +220,18 @@ def one_fold_validation(model,data_y,data_x,lambda_,initial_w,max_iter,gamma,tra
     if model==least_squares:
         w,train_loss=model(train_y,train_x)
     elif model==ridge_regression:
-        w,train_loss = model(train_y,train_x,lambda_)
+        w,train_loss = model(train_y,train_x,lambda_)        
+    elif model == prc.train or model==prc.bagging_t:
+        w= model(train_y,train_x,initial_w,max_iter,gamma)
+        y_hat=prc.predictions(train_x,w)
+        train_loss=1-compute_accuracy(train_y,y_hat)
+        y_pred =prc.predictions(test_x,w)
+        
+        test_loss=1-compute_accuracy(test_y,y_pred)
+        test_error=1-compute_accuracy(test_y,y_pred)
+        train_error=1-compute_accuracy(train_y,y_hat)
+        return w,train_loss,test_loss,test_error,train_error
+        
     else:
         w,train_loss=model(train_y,train_x,lambda_,initial_w, max_iter,gamma)
     test_loss=compute_loss(test_y,test_x,w)
@@ -248,7 +261,7 @@ def cross_validation(model,data_y,data_x,lambda_,initial_w,max_iter,gamma,propor
 #    print(test_mask)
 
 
-    return w,np.mean(train_loss), np.mean(test_loss),np.mean(test_error),np.mean(train_error),np.std(train_loss),np.std(test_loss),np.std(test_error)
+    return w,np.mean(train_loss), np.mean(test_loss),np.mean(train_error),np.mean(test_error),np.std(train_loss),np.std(test_loss),np.std(train_error),np.std(test_error)
 
 def normal_train(x):
     mu=x.mean(axis=0)

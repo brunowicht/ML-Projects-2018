@@ -15,7 +15,7 @@ import utils.perceptron as prc
 
 
 # Load clean and standardize the data
-#data_x, data_y, train_ids, means, stds = load_clean_standardize_train("../../train.csv")
+data_x, data_y, train_ids, means, stds = load_clean_standardize_train("../../train.csv",replace=True)
 #print("Cleaning done")
 #print(data_x.shape)
 #best_acc=-1.
@@ -41,9 +41,9 @@ best_gamma = 1.0e-06
 
 
 ##1e-6 is the best one for sgd
-#w=prc.train(data_y,data_x,np.array([0.]*(data_x.shape[1]+1)),1500,1e-6)
-#final_w=prc.bagging(50,data_y,data_x,np.array([.0]*(data_x.shape[1]+1)),250000,best_gamma)
-#print(np.sum(np.heaviside(data_y*prc.predictions(data_x[:250000],final_w),.5))/len(data_y))
+w=prc.train(data_y,data_x,np.array([0.]*(data_x.shape[1]+1)),1500,1e-6)
+final_w=prc.bagging(50,data_y,data_x,np.array([.0]*(data_x.shape[1]+1)),250000,best_gamma)
+print(np.sum(np.heaviside(data_y*prc.predictions(data_x[:250000],final_w),.5))/len(data_y))
 
 
 #minus 1 is because of the initial 0
@@ -51,15 +51,15 @@ best_gamma = 1.0e-06
 ## Best selection for now : 450 
 #for i in range(440,550,20):
 #print("Starting to select only : %d best values" % i)
-#liste=list(np.arange(len(final_w)))
-##list the features from the less important to the most important
-#liste.sort(key= lambda i : np.abs(final_w[i]))
-#liste=np.array(liste)-1
-#liste=liste[liste>=0] #excluding the -1 than can occur
-#selection = 450
-#reduced_data=data_x[:,liste[selection:]]
-#final_w_2=prc.bagging(100,data_y,reduced_data,np.array([.0]*(data_x.shape[1]+1-selection)),250000,best_gamma)
-#print(np.sum(np.heaviside(data_y*prc.predictions(reduced_data,final_w_2),.5))/len(data_y))
+liste=list(np.arange(len(final_w)))
+#list the features from the less important to the most important
+liste.sort(key= lambda i : np.abs(final_w[i]))
+liste=np.array(liste)-1
+liste=liste[liste>=0] #excluding the -1 than can occur
+selection = 20
+reduced_data=data_x[:,liste[selection:]]
+final_w_2=prc.bagging(100,data_y,reduced_data,np.array([.0]*(data_x.shape[1]+1-selection)),250000,best_gamma)
+print(np.sum(np.heaviside(data_y*prc.predictions(reduced_data,final_w_2),.5))/len(data_y))
 
 #
 #print(final_w_2.shape())
