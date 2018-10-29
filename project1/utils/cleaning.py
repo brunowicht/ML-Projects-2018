@@ -7,6 +7,7 @@ Created on Thu Oct 18 12:17:24 2018
 
 import numpy as np
 from utils.proj1_helpers import load_csv_data
+np.random.seed(420)
 
 def find_999_columns(dx):
     """
@@ -210,6 +211,7 @@ def shuffle(data_y,data_x):
     """
     shuffles the data_y and data_x so that the rows with same index stay the same. 
     """
+
     
     p = np.random.permutation(len(data_x))
     return data_y[p], data_x[p]

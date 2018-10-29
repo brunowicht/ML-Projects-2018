@@ -31,7 +31,7 @@ print("Done loading data and cleaning it. \n Starting perceptron with gamma = %f
 
 final_w=prc.bagging(50,data_y,data_x,np.array([.0]*(data_x.shape[1]+1)),250000,best_gamma)
 print("Found features for the model. \n Now starting to compute selection of best features")
-
+#%%
 
 ## Best selection for now : 450 
 
@@ -40,14 +40,16 @@ selection = 450
 
 #list the features from the less important to the most important
 liste=np.argsort(np.abs(final_w))
-liste=liste[liste>0] #excluding the 0 than can occur
-liste=liste-1 #because we calculated with the x0=-1, but we remove it for the input data
+
 if plotting:
 
-    plt.plot(np.abs(final_w(liste)))
+    plt.plot(np.abs(final_w[liste]))
     plt.xlabel("sorting of absolute weights")
     plt.ylabel("absolute weights")
-    plt.title("")
+    plt.title("Naive feature selection")
+liste=liste[liste>0] #excluding the 0 than can occur
+liste=liste-1 #because we calculated with the x0=-1, but we remove it for the input data
+#%%
 reduced_data=data_x[:,liste[selection:]]
 final_w_2=prc.bagging(100,data_y,reduced_data,np.array([.0]*(data_x.shape[1]+1-selection)),250000,best_gamma)
 print("Found most heavy features\n Now computing final accuracy on training set")
