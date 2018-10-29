@@ -1,4 +1,5 @@
-least_square_GD max_iter:500, gamma:0.31 -> loss = 0.389917446035
-least_square: loss = 0.38991616861
-ridge_regression: lambda: 0.0, loss = 0.389916168611
-ridge_regression: lambda: 0.0001 loss = 0.28977. cleaning done with expanding parameters to degree2
+## Project 1 for machine learning 
+- To run use the file run.py if you want to modify the path where the test.csv and train.csv files are. 
+- The main run method uses the perceptron with a bagging 100 , 250000 iterations, a gamma of 1e-6
+- The output will generate a plot of the features sorted by weights to visualize how some features are more important. 
+- 
