@@ -17,21 +17,21 @@ PATH = "../../"
 # Load clean and standardize the data
 train_file = PATH+"train.csv"
 test_file = PATH+"test.csv"
-data_x, data_y, train_ids, means, stds = load_clean_standardize_train(train_file)
-best_gamma = 1.0e-06
-filename = "ave_maria.csv"
-
-print("Done loading data and cleaning it. \n Starting perceptron with gamma = %f" % best_gamma)
-
-
-
-##1e-6 is the best one for sgd
-
-final_w=prc.bagging(50,data_y,data_x,np.array([.0]*(data_x.shape[1]+1)),250000,best_gamma)
-print("Found features for the model. \n Now starting to compute selection of best features")
-
-
-## Best selection for now : 450 
+#data_x, data_y, train_ids, means, stds = load_clean_standardize_train(train_file)
+#best_gamma = 1.0e-06
+#filename = "ave_maria.csv"
+#
+#print("Done loading data and cleaning it. \n Starting perceptron with gamma = %f" % best_gamma)
+#
+#
+#
+###1e-6 is the best one for sgd
+#
+#final_w=prc.bagging(50,data_y,data_x,np.array([.0]*(data_x.shape[1]+1)),250000,best_gamma)
+#print("Found features for the model. \n Now starting to compute selection of best features")
+#
+#
+### Best selection for now : 450 
 
 ### We now select the best features according to their weight. We found 450 to be a good zone. 
 selection = 450
