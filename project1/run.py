@@ -5,6 +5,11 @@ Created on Wed Oct 24 12:57:33 2018
 @author: Nicolas
 """
 
+import os
+import sys
+sys.path.insert(0,os.getcwd())
+plotting=True
+
 from utils.cleaning import *
 from utils.implementations import *
 from utils.proj1_helpers import *
@@ -12,10 +17,9 @@ import numpy as np
 import utils.perceptron as prc
 import matplotlib.pyplot as plt
 
-plotting=True
 
 
-PATH = "c:/Users/Test/"
+PATH = ""
 # Load clean and standardize the data
 train_file = PATH+"train.csv"
 test_file = PATH+"test.csv"
