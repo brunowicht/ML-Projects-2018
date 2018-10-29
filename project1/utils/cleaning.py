@@ -47,15 +47,10 @@ def clean_and_normalize_train_column(col):
     """
     col_copy=col.copy()
     relevant_data=col_copy[col_copy !=-999]
-    print(relevant_data)
     mean=np.median(relevant_data)
     std=np.std(relevant_data)
     col_copy[col_copy==-999]=mean
-    print(mean)
-    print(std)
-    print(col_copy)
     ret=(col_copy-mean)/std
-    print(col_copy)
     return ret, mean ,std
 def clean_and_normalize_test_column(col,mean,std):
     """
@@ -66,7 +61,6 @@ def clean_and_normalize_test_column(col,mean,std):
     """
     col_copy=col.copy()
     col_copy[col_copy==-999]=mean
-    print(col_copy)
     ret=(col_copy-mean)/std
     return ret
 
@@ -77,17 +71,13 @@ def expand_features_degree2(dx):
             - x[i] * x[j] for all i and j features. This allows for more precise computations
     """
     res = list()
-    a = 0
     for x in dx:
-        a+=1
         new = list(x)
         for i in range(len(x)):
             for j in range(i,len(x)):
                 new.append(x[i] * x[j])
         res.append(new)
-        if a % 1000 == 0:
-            print(a)
-    print("expand done")
+
     return np.array(res)
 
 def expand_features_degree3(dx):
@@ -96,11 +86,9 @@ def expand_features_degree3(dx):
         Does a 3D expansion of features 
     """
     res = list()
-    a = 0
     new = list()
 
     for x in dx:
-        a +=1 
         new = []
         for i in range(len(x)):
             for j in range(i,len(x)):
@@ -110,12 +98,10 @@ def expand_features_degree3(dx):
                 for k in range(j, len(x)):
                     new.append(x[i] * x[j] * x[k])
         res.append(new)
-        if a % 1000 == 0:
-            print(a)
+        
     return np.array(res)
 
 
-#the next function bugs a bit, test it with small matrix containing -999 kiss kisss Nicolas
 
 def clean_and_normalize(train_x,test_x):
     """
@@ -166,7 +152,7 @@ def standardize_test(dx, means, stds):
     return d.transpose()
 
 def load_clean_standardize_train(file,expansion=True,replace=True):
-      """
+    """
         Loads and cleans and standardize the training set. 
         We can decide to expand 2D the parameter and replace the columns -999 if we want. 
         

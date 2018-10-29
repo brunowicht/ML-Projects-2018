@@ -11,10 +11,8 @@ def train(y,tx,w,k,gamma):
     x=-np.ones((tx.shape[1]+1,))
 
     for i in range(k):
-#        if i > 249000 and i< 250100:
-#            print(i%len(y))
+
         idx=i%len(y)
-#        x=online_expansion_3d(tx[idx])
         x[1:]=tx[idx]
         w=w+gamma*(y[idx]-np.sign(x.dot(w)))*x
         w=w/np.sum(np.abs(w))
@@ -41,7 +39,6 @@ def predictions(tx,w):
     y_pred=np.zeros((tx.shape[0],))
     
     for i in range(tx.shape[0]):
-#        x=online_expansion_3d(tx[i])
         x[1:]=tx[i]
         y_pred[i]=np.sign(w.dot(x))
     return y_pred

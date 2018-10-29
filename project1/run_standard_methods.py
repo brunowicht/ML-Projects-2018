@@ -128,20 +128,16 @@ def do_standard_run(data_y,data_x):
 
 
 w, loss,accuracy = do_standard_run(data_y,data_x)
-print(w)
-print(loss)
-print(accuracy)
-plt.plot(accuracy)
-
-plt.xticks([0,0.2,0.4,0.6,0.8,1.],["LS","LS GD", "LS SGD", "RR","LR","RLR"])
-
-plt.show()
 
 
 
 
 
 def draw_plot_save(df,filename, hue=False):
+    """
+    Draws a plot of the dataframe and all their features. 
+    Carefull it takes a lot of time if there is a lot of features ( > 10 )
+    """
     if hue:
         plot = sns.pairplot(df,hue='y')
         print("plot done ")

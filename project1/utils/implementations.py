@@ -141,10 +141,8 @@ def logistic_regression(y,tx,initial_w,max_iter,gamma):
 
     loss = 10000
     for i in range(max_iter):
-#        print(activations)
         delta=tx.T.dot(derivative_of_cross_entropy_error(y,activations))/len(y)
         w=w-gamma*delta
-        #print(np.linalg.norm(gamma*delta))
         activations=tx.dot(w)
         
         loss = compute_loss(y, tx, w)
@@ -161,7 +159,6 @@ def reg_logistic_regression(y,tx,lambda_,initial_w,max_iter,gamma):
         delta=tx.T.dot(derivative_of_cross_entropy_error(y,activations))/len(y)+2*lambda_*w
 
         w=w-gamma*delta
-        #print(np.linalg.norm(gamma*delta))
         activations=tx.dot(w)
     loss = compute_categorical_cross_entropy(y,tx,w)
     return w, loss
@@ -201,7 +198,6 @@ def equipartition(data_y,proportion,fold_idx):
         test_pos_1=pos_1[fold_idx*per_bins_1:(fold_idx+1)*per_bins_1]
         test_pos_0=pos_0[fold_idx*per_bins_0:(fold_idx+1)*per_bins_0]
     else:
-#        print('coucou')
         test_pos_1=pos_1[fold_idx*per_bins_1:]
         test_pos_0=pos_0[fold_idx*per_bins_0:]
     test_mask=np.array([False]*size)
@@ -218,9 +214,7 @@ def one_fold_validation(model,data_y,data_x,lambda_,initial_w,max_iter,gamma,tra
     train_x=data_x[train_mask,:]
     train_y=data_y[train_mask]
     test_x=data_x[test_mask,:]
-#        train_x,test_x=fill_unknown_with_column_mean_train_test(train_x, test_x)
-#        train_x,mu_x,sigma_x=normal_train(train_x)
-#        train_y,mu_y,sigma_y=normal_train(data_y[train_mask])
+
 
     test_y=data_y[test_mask]
     
@@ -228,9 +222,7 @@ def one_fold_validation(model,data_y,data_x,lambda_,initial_w,max_iter,gamma,tra
         train_x,mean,std = cln.standardize_train(train_x)
         test_x = cln.standardize_test(test_x,mean,std)
         
-    
-#        test_x=normal_test(test_x,mu_x,sigma_x)
-#        test_y=normal_test(test_y,mu_y,sigma_y)
+
     if model==least_squares:
         w,train_loss=model(train_y,train_x)
     elif model==ridge_regression:
@@ -261,7 +253,6 @@ def cross_validation(model,data_y,data_x,lambda_,initial_w,max_iter,gamma,propor
     
     
     nb_bins=int(1./proportion)
-    size=len(data_y)
     train_loss=np.zeros(nb_bins)
     test_loss=np.zeros(nb_bins)
     #classification error
@@ -271,8 +262,7 @@ def cross_validation(model,data_y,data_x,lambda_,initial_w,max_iter,gamma,propor
 
         train_mask,test_mask=equipartition(data_y,proportion,i)
         w,train_loss[i],test_loss[i],test_error[i],train_error[i]=one_fold_validation(model,data_y,data_x,lambda_,initial_w,max_iter,gamma,train_mask,test_mask)
-        #print(test_loss[i])
-#    print(test_mask)
+
 
 
     return w,np.mean(train_loss), np.mean(test_loss),np.mean(train_error),np.mean(test_error),np.std(train_loss),np.std(test_loss),np.std(train_error),np.std(test_error)
@@ -295,13 +285,10 @@ def next_feature(model,data_y,data_x,lambda_,max_iter,gamma,proportion,fixed_fea
     best_validation_loss=1000.
     best_new_feature=nb_features
     for i in range(nb_features):
-        #recall that we don't touch the fixed features
         if i not in fixed_features:
-#            print(i)
             features=fixed_features+[i]
             regressor=np.ones((len(data_y),len(features)+1))
-#            print(regressor.shape)
-#            print(data_x[:,np.array(features)].shape)
+
             regressor[:,1:]=data_x[:,np.array(features)]
             initial_w=np.zeros(len(features)+1)
             a_,b_,c_,test_error,d_,e_,f_=cross_validation(model,data_y,regressor,lambda_,initial_w,max_iter,gamma,proportion)
