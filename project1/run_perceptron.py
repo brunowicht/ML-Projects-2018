@@ -10,10 +10,12 @@ from utils.implementations import *
 from utils.proj1_helpers import *
 import numpy as np
 import utils.perceptron as prc
+import matplotlib.pyplot as plt
+
+plotting=True
 
 
-
-PATH = "../../"
+PATH = "c:/Users/Test/"
 # Load clean and standardize the data
 train_file = PATH+"train.csv"
 test_file = PATH+"test.csv"
@@ -35,13 +37,17 @@ test_file = PATH+"test.csv"
 
 ### We now select the best features according to their weight. We found 450 to be a good zone. 
 selection = 450
-liste=list(np.arange(len(final_w)))
 
 #list the features from the less important to the most important
-liste.sort(key= lambda i : np.abs(final_w[i]))
-liste=np.array(liste)-1
-liste=liste[liste>=0] #excluding the -1 than can occur
+liste=np.argsort(np.abs(final_w))
+liste=liste[liste>0] #excluding the 0 than can occur
+liste=liste-1 #because we calculated with the x0=-1, but we remove it for the input data
+if plotting:
 
+    plt.plot(np.abs(final_w(liste)))
+    plt.xlabel("sorting of absolute weights")
+    plt.ylabel("absolute weights")
+    plt.title("")
 reduced_data=data_x[:,liste[selection:]]
 final_w_2=prc.bagging(100,data_y,reduced_data,np.array([.0]*(data_x.shape[1]+1-selection)),250000,best_gamma)
 print("Found most heavy features\n Now computing final accuracy on training set")
