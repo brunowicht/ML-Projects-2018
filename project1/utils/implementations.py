@@ -39,13 +39,17 @@ def compute_accuracy(y,y_pred):
     return np.sum(np.heaviside(y*y_pred,0.5))/len(y)
 
 def compute_gradient(y,tx,w):
+    """
+    Computes the gradient given y,tx and w. 
+    """
     e = y - tx.dot(w)
     return -tx.T.dot(e)/len(tx)
 
 
 def least_squares_GD(y,tx,initial_w,max_iters,gamma):
     """
-    
+        Performs a gradient descent using least squares method. and given parameters. 
+        
     """
     loss = 100000
     w = initial_w
@@ -61,7 +65,12 @@ def least_squares_GD(y,tx,initial_w,max_iters,gamma):
 
 
 def least_squares_SGD(y,tx,initial_w,max_iters,gamma):
-    
+    """
+        Performs a stocahstic gradient descent using least squares method. and given parameters. 
+        The batch size is of one. meaning only a single point is sampled. 
+        
+    """
+
     w = initial_w
     loss = 10000
     for i in range(max_iters):
@@ -76,7 +85,9 @@ def least_squares_SGD(y,tx,initial_w,max_iters,gamma):
     return w , loss
         
 def least_squares(y,tx):
-    
+    """
+        Computes features and loss according to least squares method. 
+    """
     a = tx.T.dot(tx)
     b = tx.T.dot(y)
     w = np.linalg.solve(a, b)
@@ -84,6 +95,9 @@ def least_squares(y,tx):
     return w , loss
     
 def ridge_regression(y,tx,lambda_):
+    """
+        Computes features and loss according to ridge regression method seen in class. 
+    """
     ## l is mse 
     ## we want (xtx + lambda*2N * I )^-1* xTy
     xty = tx.T.dot(y)

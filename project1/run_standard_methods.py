@@ -24,9 +24,9 @@ import seaborn as sns
 
 
 # Load clean and standardize the data
-data_x, data_y, train_ids, means, stds = load_clean_standardize_train("../../train.csv",expansion=False, replace=False )
-print("Cleaning done")
-print(data_x.shape)
+#data_x, data_y, train_ids, means, stds = load_clean_standardize_train("../../train.csv",expansion=False, replace=False )
+#print("Cleaning done")
+#print(data_x.shape)
 
 #do the least square method .
 
@@ -123,7 +123,7 @@ def do_standard_run(data_y,data_x):
     accuracies.append(compute_accuracy(data_y,predict_labels(w_rlr,data_x)))
     
    
-    return ws,losses,accuracy    
+    return ws,losses,accuracies  
 #    return ws[np.where(np.min(losses)==losses)[0][0]], losses[np.where(np.min(losses)==losses)[0][0]], accuracies[np.where(np.min(losses)==losses)[0][0]]
 
 
