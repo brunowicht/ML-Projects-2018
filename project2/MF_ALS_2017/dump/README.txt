@@ -1,0 +1,1 @@
+this folder will contain all the dump files used for recomputing with specific parameters. The recompilation will be way faster than the first time it was run
