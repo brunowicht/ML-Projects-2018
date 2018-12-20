@@ -46,12 +46,12 @@ from keras.constraints import non_neg
 ## input -> embedding -> flattening
 movie_input = keras.layers.Input(shape=[1],name='Item')
 movie_embedding = keras.layers.Embedding(n_movies + 1, n_latent_factors, name='Movie-Embedding', embeddings_constraint=non_neg())(movie_input)
-movie_vec = keras.layers.Flatten(name='FlattenMovies')(movie_embedding
+movie_vec = keras.layers.Flatten(name='FlattenMovies')(movie_embedding)
 
 ## input -> embedding -> flattening
 user_input = keras.layers.Input(shape=[1],name='User')
-user_embedding = keras.layers.Embedding(n_users + 1, n_latent_factors,name='User-Embedding', embeddings_constraint=non_neg())(user_input)
-user_vec = keras.layers.Flatten(name='FlattenUsers')
+user_embedding = keras.layers.Embedding(n_users + 1, n_latent_factors,name='User-Embedding')(user_input)
+user_vec = keras.layers.Flatten(name='FlattenUsers')(user_embedding)
 
 ## Make the dot product. and compile
 prod = keras.layers.dot([movie_vec, user_vec],axes=1)
