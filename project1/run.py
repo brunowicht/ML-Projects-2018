@@ -17,7 +17,7 @@ import numpy as np
 import utils.perceptron as prc
 import matplotlib.pyplot as plt
 
-
+print("Starting to load the data..\n")
 
 PATH = ""
 # Load clean and standardize the data
@@ -55,7 +55,8 @@ liste=liste-1 #because we calculated with the x0=-1, but we remove it for the in
 reduced_data=data_x[:,liste[selection:]]
 final_w_2=prc.bagging(100,data_y,reduced_data,np.array([.0]*(data_x.shape[1]+1-selection)),250000,best_gamma)
 print("Found most heavy features\n Now computing final accuracy on training set")
-print("Final accuracy of the perceptron on the train set : %f " % np.sum(np.heaviside(data_y*prc.predictions(reduced_data,final_w_2),.5))/len(data_y))
+print("Final accuracy of the perceptron on the train set : " )
+print(np.sum(np.heaviside(data_y*prc.predictions(reduced_data,final_w_2),.5))/len(data_y))
 
 print("Using model on test dataset.")
 test_x, test_y, test_ids = load_clean_standardize_test(test_file, means, stds)
